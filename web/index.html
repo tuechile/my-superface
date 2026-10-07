@@ -8,15 +8,20 @@
   body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
   label { display: block; margin: .5rem 0; }
   canvas { display: block; width: 100%; max-width: 512px; margin-top: 1rem; image-rendering: pixelated; }
+  details { margin: .5rem 0; font-size: .8rem; color: #888; }
+  summary { cursor: pointer; }
 </style>
 </head>
 <body>
 <h1>my-superface</h1>
 <form id="form">
   <label>Source <input type="file" name="source" accept="image/*" required></label>
-  <label>Target <input type="file" name="target" accept="image/*" required></label>
   <label>Size <input type="number" name="size" value="128" min="8" max="256"></label>
   <label>Spatial weight <input type="number" name="spatial" value="2" step="0.5" min="0"></label>
+  <details>
+    <summary>change face</summary>
+    <input type="file" name="target" accept="image/*">
+  </details>
   <button>Transform</button>
   <button type="button" id="replay" disabled>Replay</button>
   <button type="button" id="download" disabled>Download</button>
@@ -39,7 +44,7 @@
     status.textContent = "working...";
     await new Promise((r) => setTimeout(r, 0));
     const src = await loadPixels(fields.source.files[0], size);
-    const tgt = await loadPixels(fields.target.files[0], size);
+    const tgt = await loadPixels(fields.target.files[0] || (await (await fetch("face.jpg")).blob()), size);
     const dest = assign(src, tgt, size, Number(fields.spatial.value));
     result = { src, dest, size };
     status.textContent = "";

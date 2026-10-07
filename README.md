@@ -17,13 +17,13 @@ Step 3 is a linear assignment problem. The exact solver (Hungarian) took 25s at 
 
 ## Try it
 
-Everything runs in your browser, with no server and no uploads. Open `web/index.html` directly, or serve the repo locally:
+Everything runs in your browser, with no server and no uploads. Serve the repo locally (opening the file directly can't load the default face):
 
 ```bash
 python3 -m http.server 8001
 ```
 
-Then open http://localhost:8001/web/, pick a source image and a target, and click Transform. Sample images are in `samples/`.
+Then open http://localhost:8001/web/, pick a source image and click Transform. It morphs into `web/face.jpg` by default; open "change face" to use a different target. Sample images are in `samples/`.
 
 Options: Size (grid size, default 128, max 256) and Spatial weight (how strongly pixels stay near where they started, default 2; lower gives a sharper target but longer travel).
 
@@ -52,6 +52,7 @@ python3 -m venv .venv
 ```
 web/
   index.html    page
+  face.jpg      default target (square crop)
   superface.js  load, assign, animate (the app)
 superface/
   core.py       numpy version of the same algorithm
