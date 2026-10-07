@@ -45,18 +45,18 @@
     await new Promise((r) => setTimeout(r, 0));
     const src = await loadPixels(fields.source.files[0], size);
     const tgt = await loadPixels(fields.target.files[0] || (await (await fetch("face.jpg")).blob()), size);
-    const dest = assign(src, tgt, size, Number(fields.spatial.value));
-    result = { src, dest, size };
+    const { owner, swaps } = assign(src, tgt, size, Number(fields.spatial.value));
+    result = { palette: colors(src), owner, swaps, size };
     status.textContent = "";
     canvas.hidden = false;
     replay.disabled = download.disabled = false;
-    play(canvas, src, dest, size);
+    play(canvas, result.palette, swaps, size);
   };
 
-  replay.onclick = () => play(canvas, result.src, result.dest, result.size);
+  replay.onclick = () => play(canvas, result.palette, result.swaps, result.size);
 
   download.onclick = () => {
-    drawFrame(canvas, result.src, result.dest, result.size, 1);
+    drawFrame(canvas, result.palette, result.owner, result.size);
     const a = document.createElement("a");
     a.download = "superface.png";
     a.href = canvas.toDataURL("image/png");

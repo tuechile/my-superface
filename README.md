@@ -11,9 +11,11 @@ No pixel is created or recolored. Every pixel in the source image is moved to a 
 3. Find a one-to-one assignment from source pixels to target positions that minimizes
    `|color_src - color_tgt|^2 + spatial_weight * |pos_src - pos_tgt|^2`.
 4. Build the output by putting each source pixel at its assigned target position.
-5. Optionally animate by interpolating every pixel from its start to its end position.
+5. Animate by replaying the swaps in order.
 
-Step 3 is a linear assignment problem. The exact solver (Hungarian) took 25s at 64x64 and 4 min at 96x96, so we solve it approximately instead. Every pixel starts where it already is. Then we repeatedly pick pairs of nearby spots and swap the pixels on them whenever that lowers the cost. The search radius shrinks from half the image down to 1px. With the default `spatial_weight=2`, pixels move about 5% of the image width on average, so the animation stays subtle, like obamify.
+Step 3 is a linear assignment problem. The exact solver (Hungarian) took 25s at 64x64 and 4 min at 96x96, so we solve it approximately instead. Every pixel starts where it already is. Then we repeatedly look at pairs of neighboring pixels and swap them whenever that makes the picture closer to the target. Pixels only ever trade places with an adjacent pixel, so they move about 4px on average at 128x128.
+
+Every swap is recorded, and the animation replays them in order, so you watch neighbors trade places until the face appears. Every frame is a full grid of the original pixels, so there are no gaps.
 
 ## Try it
 
@@ -64,7 +66,8 @@ tests/          Python tests
 
 ## Roadmap
 
-- [x] Local swap assignment (short pixel travel)
+- [x] Neighbor-swap assignment (short pixel travel)
+- [x] Gap-free animation that replays the swaps
 - [x] CLI with gif export
 - [x] Runs fully in the browser
 - [ ] Face auto-crop on the target

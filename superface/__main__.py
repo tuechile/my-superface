@@ -12,7 +12,7 @@ parser.add_argument("--gif")
 args = parser.parse_args()
 
 source = load(args.source, args.size)
-dest = assign(source, load(args.target, args.size), args.spatial)
-to_image(render(source, dest)).save(args.out)
+owner, swaps = assign(source, load(args.target, args.size), args.spatial)
+to_image(render(source, owner)).save(args.out)
 if args.gif:
-    save_gif(animate(source, dest), args.gif)
+    save_gif(animate(source, swaps), args.gif)
