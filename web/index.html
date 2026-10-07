@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>my-superface</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+  label { display: block; margin: .5rem 0; }
+  .row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+  img { width: 256px; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<h1>my-superface</h1>
+<form id="form">
+  <label>Source <input type="file" name="source" accept="image/*" required></label>
+  <label>Target <input type="file" name="target" accept="image/*" required></label>
+  <label>Size <input type="number" name="size" value="128" min="8" max="256"></label>
+  <label>Spatial weight <input type="number" name="spatial" value="2" step="0.5" min="0"></label>
+  <button>Transform</button> <span id="status"></span>
+</form>
+<div class="row">
+  <img id="image" hidden>
+  <img id="animation" hidden>
+</div>
+<script>
+  const form = document.getElementById("form");
+  const status = document.getElementById("status");
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    status.textContent = "working...";
+    const res = await fetch("/transform", { method: "POST", body: new FormData(form) });
+    const data = await res.json();
+    if (!res.ok) { status.textContent = data.detail; return; }
+    for (const key of ["image", "animation"]) {
+      const el = document.getElementById(key);
+      el.src = data[key];
+      el.hidden = false;
+    }
+    status.textContent = "";
+  };
+</script>
+</body>
+</html>
