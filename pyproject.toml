@@ -5,9 +5,6 @@ requires-python = ">=3.11"
 dependencies = [
     "numpy",
     "pillow",
-    "fastapi",
-    "uvicorn",
-    "python-multipart",
 ]
 
 [project.optional-dependencies]

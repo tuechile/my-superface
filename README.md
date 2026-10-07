@@ -15,61 +15,57 @@ No pixel is created or recolored. Every pixel in the source image is moved to a 
 
 Step 3 is a linear assignment problem. The exact solver (Hungarian) took 25s at 64x64 and 4 min at 96x96, so we solve it approximately instead. Every pixel starts where it already is. Then we repeatedly pick pairs of nearby spots and swap the pixels on them whenever that lowers the cost. The search radius shrinks from half the image down to 1px. With the default `spatial_weight=2`, pixels move about 5% of the image width on average, so the animation stays subtle, like obamify.
 
-## Stack
+## Try it
 
-- Python 3.11+
-- numpy, pillow for the core
-- FastAPI + uvicorn for the API
-- A single static HTML page for the frontend
+Everything runs in your browser, with no server and no uploads. Open `web/index.html` directly, or serve the repo locally:
 
-## Setup
+```bash
+python3 -m http.server 8001
+```
+
+Then open http://localhost:8001/web/, pick a source image and a target, and click Transform. Sample images are in `samples/`.
+
+Options: Size (grid size, default 128, max 256) and Spatial weight (how strongly pixels stay near where they started, default 2; lower gives a sharper target but longer travel).
+
+## Deploy
+
+`.github/workflows/pages.yml` publishes `web/` to GitHub Pages on every push to `main`. In the repo on GitHub, set Settings → Pages → Source to "GitHub Actions" once.
+
+## Python version
+
+`superface/` is the same algorithm in numpy, for experiments and gif export:
 
 ```bash
 python3 -m venv .venv
 ```
 
 ```bash
-source .venv/bin/activate
+.venv/bin/pip install -e ".[dev]"
 ```
 
 ```bash
-pip install -e ".[dev]"
+.venv/bin/python -m superface samples/textured.png samples/smiley.png out.png --gif out.gif
 ```
-
-## Run
-
-Command line:
-
-```bash
-.venv/bin/python -m superface samples/gradient.png samples/smiley.png out.png --gif out.gif
-```
-
-Web demo, then open http://localhost:8000 (add `--port 8001` if 8000 is taken):
-
-```bash
-.venv/bin/uvicorn superface.api:app --reload
-```
-
-Options: `--size` (grid size, default 128, max 256 in the web demo) and `--spatial` (how strongly pixels stay near where they started, default 2; lower means a sharper target but longer travel).
 
 ## Layout
 
 ```
-superface/
-  core.py      load, assign, render, animate
-  __main__.py  CLI
-  api.py       FastAPI app, serves web/index.html
 web/
-  index.html   upload source + target, show result
-samples/       demo images
-tests/
+  index.html    page
+  superface.js  load, assign, animate (the app)
+superface/
+  core.py       numpy version of the same algorithm
+  __main__.py   CLI
+samples/        demo images
+tests/          Python tests
+.github/workflows/pages.yml
 ```
 
 ## Roadmap
 
 - [x] Local swap assignment (short pixel travel)
 - [x] CLI with gif export
-- [x] API endpoint + simple web page
+- [x] Runs fully in the browser
 - [ ] Face auto-crop on the target
-- [ ] mp4 export / smoother animation
-- [ ] Faster solver for 256+ grids
+- [ ] Fill the small gaps mid-animation
+- [ ] Web Worker so big grids don't freeze the page
